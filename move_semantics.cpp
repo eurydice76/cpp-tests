@@ -89,9 +89,11 @@ public:
 public:
 
 	A _a;
+
+	int* _ptr;
 };
 
-AContainer::AContainer() : _a()
+AContainer::AContainer() : _a(), _ptr(new int(100))
 {
 	std::cout<<"ACONTAINER: default ctor of "<<this<<std::endl;
 }
@@ -100,33 +102,44 @@ AContainer::AContainer(const AContainer& other)
 {
 	std::cout<<"ACONTAINER: copy ctor from "<<&other<<" to "<<this<<std::endl;
 	_a = other._a;
+	_ptr = new int(*other._ptr);
+
 }
 
 AContainer::AContainer(AContainer&& other)
 {
 	std::cout<<"ACONTAINER: move ctor from "<<&other<<" to "<<this<<std::endl;
 	_a = std::move(other._a);
+	_ptr = other._ptr;
+	other._ptr = nullptr;
 }
 
 AContainer& AContainer::operator=(const AContainer& other)
 {
 	std::cout<<"ACONTAINER: copy assignment otor from "<<&other<<" to "<<this<<std::endl;
-	if (this != &other)	
+	if (this != &other)	{
 		_a = other._a;
+		_ptr = new int(*other._ptr);
+	}
 	return *this;
 }
 
 AContainer& AContainer::operator=(AContainer&& other)
 {
 	std::cout<<"ACONTAINER: move assignment otor from "<<&other<<" to "<<this<<std::endl;
-	if (this != &other)	
+	if (this != &other)	{
 		_a = std::move(other._a); // other is a rvalue reference but a rvalue reference is an lvalue whence the use of std::move 
+		delete _ptr; // The memory block targeted by this pointer has to be deleted before assigning this pointer to the other  		
+		_ptr = other._ptr;
+		other._ptr = nullptr; // The other pointer has to be nullified to definitely move its memory block to the target  
+	}
 	return *this;
 }
 
 AContainer::~AContainer()
 {
 	std::cout<<"ACONTAINER: dtor of "<<this<<std::endl;
+	delete _ptr;
 }
 
 AContainer getContainer() {
@@ -144,6 +157,7 @@ int main() {
 
 	AContainer&& ra = getContainer(); // ra is the rvalue reference, It will "steal" the contents of the temp returned by getContainer
 	std::cout<<std::endl;
+	return 0;
 }
 
 
