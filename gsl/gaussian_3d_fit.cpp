@@ -339,7 +339,7 @@ int main() {
     gsl_workspace = gsl_multifit_nlinear_alloc(gsl_multifit_nlinear_trust, &gsl_fdf_params, n_points3, 11);
 
     gsl_fdf.f = &gsl_residuals_wrapper;
-    gsl_fdf.df = &gsl_jacobian_wrapper;
+    gsl_fdf.df = &gsl_jacobian_wrapper; // If nullptr is set instead of a valid function, numeric derivative will be used instead.
     gsl_fdf.p = 11;
     gsl_fdf.n = n_points3;
     gsl_fdf.params = &gaussian;
